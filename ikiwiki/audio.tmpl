@@ -1,0 +1,59 @@
+<div class="<TMPL_VAR CLASS>">
+
+<TMPL_IF PAGEURL>
+<audio src="<TMPL_VAR PAGEURL>" controls="true">
+        <TMPL_IF nocando><TMPL_VAR nocando>
+        <TMPL_ELSE>Tu navegardor de web no puede reporducir la radio, pique <a href="http://www.mozilla-europe.org/es/firefox/">aqui para instalar firefox</a>
+    </TMPL_IF></audio>
+
+    <div id="media-descarga">
+        <a href="<TMPL_VAR PAGEURL>" title="enlace directo">Enlace Directo</a>
+    </div>
+
+<TMPL_ELSE>
+        <TMPL_IF TITLE>
+             <h3 class="audiotagtitle"><TMPL_VAR TITLE> - <TMPL_VAR Artist></h3>
+        </TMPL_IF>
+    <audio controls="true">
+        <TMPL_IF SRC0>
+        <source src="<TMPL_VAR SRC0>" <TMPL_IF TYPE0>
+            type="<TMPL_VAR TYPE0>
+            </TMPL_IF>
+            "/>
+        <source src="<TMPL_VAR SRC1>" <TMPL_IF TYPE1>type="<TMPL_VAR TYPE1></TMPL_IF>"/>
+        <TMPL_ELSE>
+        <source src="<TMPL_VAR SRC>"/>
+        </TMPL_IF>
+      <TMPL_IF nocando><TMPL_VAR nocando>
+      <TMPL_ELSE>Tu navegardor de web no puede reporducir la radio, pique <a href="http://www.mozilla-europe.org/es/firefox/">aqui para instalar firefox</a>
+      </TMPL_IF>
+      
+      <TMPL_IF FALLBACK>
+          <object class="playerpreview" type="application/x-shockwave-flash" 
+          data="Jplayer.swf" width="200" height="20">
+    <param name="movie" value="Jplayer.swf" />
+    <param name="bgcolor" value="#085c68" />
+    <param name="FlashVars" value="mp3=<TMPL_VAR FALLBACK>" />
+    <embed href="Jplayer.swf" bgcolor="#085c68" width="200" 
+           height="20" name="movie" align="" 
+           type="application/x-shockwave-flash" flashvars="mp3=<TMPL_VAR FALLBACK>">
+    </embed>
+  </object>
+    </TMPL_IF>
+
+      
+      </audio>
+      <ul id="tags">
+      <TMPL_IF TITLE><li  class="tag">Title: <TMPL_VAR TITLE></li></TMPL_IF>
+      <TMPL_IF ARTIST><li  class="tag">Artist: <TMPL_VAR ARTIST></li></TMPL_IF>
+      <TMPL_IF GENRE><li class="tag">Genre: <TMPL_VAR GENRE></li></TMPL_IF>
+      <TMPL_IF DATE><li class="tag">Date: <TMPL_VAR DATE></li></TMPL_IF>
+      <li><TMPL_IF SRC0>Enlace Directo: <a class="downloadlink" href="<TMPL_VAR SRC0>" title="enlace directo">0</a>, <TMPL_IF SRC1><a class="downloadlink" href="<TMPL_VAR SRC1>" title="enlace directo">1</a></TMPL_IF><TMPL_ELSE SRC><a class="downloadlink" href="<TMPL_VAR SRC>" title="enlace directo">Enlace Directo</a></TMPL_IF></li>
+      </ul>
+
+
+
+</TMPL_IF>
+
+</div>
+
