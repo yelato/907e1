@@ -1,0 +1,12 @@
+#!/bin/bash
+if [ -z $1 ] 
+then
+    echo "please supply username"
+    exit 1
+fi
+rm -r /home/$1
+#rm  /etc/apache2/sites-available/$1 
+deluser $1
+delgroup $1
+a2dissite $1
+/etc/init.d/apache2 reload
