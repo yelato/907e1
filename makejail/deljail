@@ -1,21 +1,48 @@
 #!/bin/bash
+#descripcion: elimina un usaurio y su respectiva configuración
+#  __ _        _                            
+# / _| |_   _ (_) ___  ___   ___  _ __ __ _ 
+#| |_| | | | || |/ _ \/ __| / _ \| '__/ _` |
+#|  _| | |_| || | (_) \__ \| (_) | | | (_| |
+#|_| |_|\__,_|/ |\___/|___(_)___/|_|  \__, |
+#           |__/                      |___/
+
+#Errores
+ERROR_0="Ejecute: ${0} como usuario privelegiado"
+ERROR_1="Hace falta el argumento nombre usuario"
+ERROR_2="Usuario inexistente, por favor ejecute ${0} con un nombre de usaurio existente"
 
 #validando que el usuario que ejecuta este guion sea del grupo de usuario root
 if [ `id -g` -ne 0 ]
 then
-  echo "Usage:  ./$0 root group"
-  exit $E_BADARGS
+  echo ${ERROR_0}
+  exit 1
 fi
 
-
+#Revisando que exista argumento el nombre del usaurio
 if [ -z $1 ] 
 then
-    echo "please supply username"
+    echo ${ERROR_1}
     exit 1
 fi
-rm -fr /home/$1
-#rm  /etc/apache2/sites-available/$1 
-deluser $1
-delgroup $1
-a2dissite $1
-/etc/init.d/apache2 reload
+
+#Revisando que usuario exista
+grep -Eq "^$USER:" /etc/passwd
+if [ $? -eq 1 ]; then
+    echo ${ERROR_2}
+    exit 1
+fi
+
+function borrar_usuario()
+{
+	rm -fr /home/${1}
+	#rm  /etc/apache2/sites-available/$1 
+	deluser ${1}
+	delgroup ${1}
+	a2dissite ${1}
+	/etc/init.d/apache2 reload
+	#ejecutamos config_apache con opción de eliminación de configuración (pendiente)
+	#config_apache -del $1
+}
+
+borrar_usuario $1
