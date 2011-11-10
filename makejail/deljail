@@ -1,4 +1,13 @@
 #!/bin/bash
+
+#validando que el usuario que ejecuta este guion sea del grupo de usuario root
+if [ `id -g` -ne 0 ]
+then
+  echo "Usage:  ./$0 root group"
+  exit $E_BADARGS
+fi
+
+
 if [ -z $1 ] 
 then
     echo "please supply username"
