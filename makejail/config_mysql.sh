@@ -12,6 +12,7 @@
 mysql_admin='root'
 mysql_admin_pass='secret'
 
+export mysql_bin=`which mysql`
 ########################################################
 # FUNCIÓN        							   #
 ########################################################
@@ -26,16 +27,12 @@ DESCRIPCIÓN
 
 OPCIONES
 	 -help: Muestra este menu.
-	 -start: inicia el conky.
-	 -update: Actualiza los archivos.
-	 -revision: Muestra el número de la ultima revisión.
-	 -author: Muestra el autor de la ultima revisión.
-	 -date: Muestra la fecha de la ultima revisión.
-	 -msg N: Imprime en un párrafo de longitud N mensaje de la ultima revisión.
+	 -add: crea un usaurio mySql y su respectiva BD 
+	 -rm: crea un usaurio mySql y su respectiva BD 
 
 ARCHIVOS
-	$HOME/.cofig/conky/proyectos.xml
-		Contiene la configuracion de las variables de los proyectos a mostrar
+	$0
+		Es este script
 "
 }
 ########################################################
@@ -46,25 +43,24 @@ ERROR_1='Debe agregar la opcion y el nombre del usuario.'
 ########################################################
 # Agrega una BD y un usuario con el mismo nombre       #
 ########################################################
-function mysql_add_usser_config {
-	#/usr/bin/mysql --user='root' --password='passX'
-	mysql='/opt/lampp/bin/./mysql'
-	$mysql --user=$mysql_admin --password=$mysql_admin_pass -e "CREATE USER '$user'@'localhost' IDENTIFIED BY '$password';"
-	$mysql --user=$mysql_admin --password=$mysql_admin_pass -e "CREATE DATABASE $user;"
-	$mysql --user=$mysql_admin --password=$mysql_admin_pass -e "GRANT ALL PRIVILEGES ON $user.* TO '$user'@'localhost';"
-	$mysql --user=$mysql_admin --password=$mysql_admin_pass -e "FLUSH PRIVILEGES;"
+function mysql_add_user_config {
+	$mysql_bin --user=$mysql_bin_admin --password=$mysql_bin_admin_pass -e "CREATE USER '$user'@'localhost' IDENTIFIED BY '$password';"
+	$mysql_bin --user=$mysql_bin_admin --password=$mysql_bin_admin_pass -e "CREATE DATABASE $user;"
+	$mysql_bin --user=$mysql_bin_admin --password=$mysql_bin_admin_pass -e "GRANT ALL PRIVILEGES ON $user.* TO '$user'@'localhost';"
+	$mysql_bin --user=$mysql_bin_admin --password=$mysql_bin_admin_pass -e "FLUSH PRIVILEGES;"
 	## Borrando:
 	#DROP USER '$user'@'localhost';
 	#DROP DATABASE IF EXISTS `$user`;
 }
+
 ########################################################
-# Elimina a unn usuario y su BD del sistema            #
+# Elimina a un usuario y su BD del sistema            #
 ########################################################
-function mysql_rm_usser_config {
+function mysql_rm_user_config {
 	#/usr/bin/mysql --user='root' --password='passX'
 	mysql='/opt/lampp/bin/./mysql'
-	$mysql --user=$mysql_admin -e "DROP DATABASE IF EXISTS $user;"
-	$mysql --user=$mysql_admin -e "DROP USER '$user'@'localhost';"
+	$mysql_bin --user=$mysql_bin_admin -e "DROP DATABASE IF EXISTS $user;"
+	$mysql_bin --user=$mysql_bin_admin -e "DROP USER '$user'@'localhost';"
 }
 #mysql_rm_usser_config
 #revisando si no existe ningun argumento.
@@ -74,4 +70,21 @@ function mysql_rm_usser_config {
 user="$1"
 password="$1"
 
-mysql_add_usser_config
+case "$1" in
+   "")
+	msg_opciones;
+	exit 1;
+      ;;
+   -add)
+      mysql_add_user_config
+      exit 0;
+      ;;
+   -rm)
+      mysql_rm_user_config
+      exit 0;
+	;;
+esac
+
+msg_opciones;
+exit 1;
+
