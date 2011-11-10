@@ -1,0 +1,47 @@
+#!/bin/bash
+#
+#Configuracion de apache2
+#Configuracion general
+apache_file_config_sites='/etc/apache2/sites-enabled/000-default'
+
+########################################################
+# Agrega un servidor virtual de apache                 #
+########################################################
+function apache_add_virtual_host {
+	#Agregamos al final del archivo de config, de apache un hostVirtual hacia $USER
+	echo "<VirtualHost *:80>
+	        ServerAdmin $USER@localhost
+	        ServerName $USER.pezenelarbol.org
+	        ServerAlias *.$USER.pezenelarbol.org
+
+	        DirectoryIndex index.html index.htm index.php
+	        DocumentRoot /home/$USER/home/$USER/public_html/
+
+	        ScriptAlias /cgi-bin/ /home/$USER/home/$USER/cgi-bin/
+	        <Location /cgi-bin>
+	                Options +ExecCGI
+	        </Location>
+
+	        <Directory /home/$USER/home/$USER/public_html>
+	                Options Indexes FollowSymLinks MultiViews
+	                AllowOverride All
+	                Order allow,deny
+	                Allow from all
+	        </Directory>
+		php_admin_value open_basedir ${DEST}/home/${USER}:/tmp
+		php_admin_value upload_tmp_dir ${DEST}/tmp
+		php_admin_value session.save_path ${DEST}/tmp
+	        ErrorLog /home/$USER/home/$USER/logs/error.log
+	        CustomLog /home/$USER/home/$USER/logs/access.log combined
+	</VirtualHost>" >> $apache_file_config_sites
+}
+########################################################
+# Elimina un servidor virtual de apache                 #
+########################################################
+function apache_rm_virtual_host {
+	#Agregamos al final del archivo de config, de apache un hostVirtual hacia $USER
+}
+
+
+export USER=$1
+apache_add_virtual_host

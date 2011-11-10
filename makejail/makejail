@@ -133,14 +133,14 @@ chmod 600 ${DEST}/home/$USER/.rnd
 chown $USER:$USER ${DEST}/home/$USER/.rnd 
 
 #clean un /etc/passwd
-egrep "^$USER" /etc/passwd| sed -i "s/\/home\/$USER\/home\/$USER/\/home\/$USER/" /etc/passwd 
-egrep "^www-data" /etc/passwd> etc/passwd
-egrep "^www-data" /etc/shadow> etc/shadow
-egrep "^www-data" /etc/group> etc/group
-egrep "^crontab" /etc/group>> etc/group
-egrep "^$USER" /etc/passwd>> ${DEST}/etc/passwd
-egrep "^$USER" /etc/shadow>> ${DEST}/etc/shadow
-egrep "^$USER" /etc/group>> ${DEST}/etc/group
+sed -i "s/\/home\/$USER\/home\/$USER/\/home\/$USER/" /etc/passwd
+grep -E "^www-data" /etc/passwd > etc/passwd
+grep -E "^www-data" /etc/shadow > etc/shadow
+grep -E "^www-data" /etc/group > etc/group
+grep -E "^crontab" /etc/group >> etc/group
+grep -E "^$USER" /etc/passwd >> ${DEST}/etc/passwd
+grep -E "^$USER" /etc/shadow >> ${DEST}/etc/shadow
+grep -E "^$USER" /etc/group >> ${DEST}/etc/group
 chmod 600 ${DEST}/etc/shadow
 
 echo "\nexport EDITOR=nano" >> ${DEST}/home/$USER/.profile
