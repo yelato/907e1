@@ -141,10 +141,10 @@ chown $USER:$USER ${DEST}/home/$USER/.rnd
 
 #clean un /etc/passwd
 sed -i "s/\/home\/$USER\/home\/$USER/\/home\/$USER/" /etc/passwd
-grep -E "^www-data" /etc/passwd > etc/passwd
-grep -E "^www-data" /etc/shadow > etc/shadow
-grep -E "^www-data" /etc/group > etc/group
-grep -E "^crontab" /etc/group >> etc/group
+grep -E "^www-data" /etc/passwd > ${DEST}/etc/passwd
+grep -E "^www-data" /etc/shadow > ${DEST}/etc/shadow
+grep -E "^www-data" /etc/group > ${DEST}/etc/group
+grep -E "^crontab" /etc/group >> ${DEST}/etc/group
 grep -E "^$USER" /etc/passwd >> ${DEST}/etc/passwd
 grep -E "^$USER" /etc/shadow >> ${DEST}/etc/shadow
 grep -E "^$USER" /etc/group >> ${DEST}/etc/group
