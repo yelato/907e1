@@ -18,14 +18,14 @@ then
 fi
 
 #test if user exists
-egrep "^$USER" /etc/passwd >/dev/null
+grep -Eq "^$USER:" /etc/passwd
 if [ $? -eq 0 ]; then
     echo "$USER exists!"
     exit 1
 fi
 
 echo "build chroot enviornment"
-mkdir ${DEST}
+mkdir -p ${DEST}
 
 DIRS="tmp dev etc lib usr bin lib64 lib32"
 for dir in ${DIRS}
