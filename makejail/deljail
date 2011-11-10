@@ -4,7 +4,7 @@ then
     echo "please supply username"
     exit 1
 fi
-rm -r /home/$1
+rm -fr /home/$1
 #rm  /etc/apache2/sites-available/$1 
 deluser $1
 delgroup $1
