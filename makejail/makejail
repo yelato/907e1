@@ -102,7 +102,7 @@ cp /lib/libnss_nis.so.2 ${DEST}/lib/
 cp /lib/libnss_files.so.2 ${DEST}/lib/
 
 #copy binarys
-BINS="openssl php mysql mysqldump mysqlrepair vi tar gzip rm ls mkdir cp less bash rsync ssh scp wget date cat mv grep nano chmod gpg passwd nano-tiny find dash editor crontab env dirname uname tput which"
+BINS="openssl php mysql mysqldump mysqlrepair vi tar gzip rm ls mkdir cp less bash rsync ssh scp wget date cat mv grep nano chmod gpg passwd nano-tiny find dash editor crontab env dirname uname tput which mail sendmail"
 
 addbin () {
     ORIG=$(which $1)
@@ -145,12 +145,21 @@ grep -E "^www-data" /etc/passwd > ${DEST}/etc/passwd
 grep -E "^www-data" /etc/shadow > ${DEST}/etc/shadow
 grep -E "^www-data" /etc/group > ${DEST}/etc/group
 grep -E "^crontab" /etc/group >> ${DEST}/etc/group
+grep -E "^sendmail" /etc/group >> ${DEST}/etc/group
+grep -E "^sendmail" /etc/passwd >> ${DEST}/etc/passwd
 grep -E "^$USER" /etc/passwd >> ${DEST}/etc/passwd
 grep -E "^$USER" /etc/shadow >> ${DEST}/etc/shadow
 grep -E "^$USER" /etc/group >> ${DEST}/etc/group
 chmod 600 ${DEST}/etc/shadow
 
 echo "\nexport EDITOR=nano" >> ${DEST}/home/$USER/.profile
+
+#set up mail
+chown sendmail.nogroup ${DEST}/usr/bin/sendmail
+cp -r /etc/ssmtp ${DEST}/etc/
+chown root.sendmail ${DEST}/etc/ssmtp/*
+cp /usr/lib/sendmail usr/lib/sendmail
+l2chroot /usr/lib/sendmail ${DEST}
 
 #set up cron
 mkdir -p ${DEST}/var/spool/cron/crontabs
