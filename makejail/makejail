@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #descripcion: Crea un jail
 #  __ _        _                            
 # / _| |_   _ (_) ___  ___   ___  _ __ __ _ 
@@ -32,6 +32,13 @@ grep -Eq "^${USER}:" /etc/passwd
 if [ ${?} -eq 0 ]; then
     echo "${USER} exists!"
     exit 1
+fi
+
+#Revisando que tenga los permisos adecuados
+if [ `id -g` -ne 0 ]
+then
+  echo "Usage:  ./${0} root group"
+  exit 1
 fi
 
 ################################################################################
