@@ -15,7 +15,7 @@
 #   AllowTcpForwarding n
 
 #revisando si no existe ningun argumento.
-[ $# -ne 1 ] && { echo "Usar ./${0} user"; exit 1; }
+[ ${#} -ne 1 ] && { echo "Usar ./${0} user"; exit 1; }
 
 USER="${1}"
 DEST="/home/${1}"
@@ -29,7 +29,7 @@ fi
 
 #test if user exists
 grep -Eq "^${USER}:" /etc/passwd
-if [ $? -eq 0 ]; then
+if [ ${?} -eq 0 ]; then
     echo "${USER} exists!"
     exit 1
 fi
@@ -110,7 +110,7 @@ BINS="openssl php mysql mysqldump mysqlrepair vi tar gzip rm ls mkdir cp less ba
 
 function addbin ()
 {
-    ORIG=$(which ${1})
+    ORIG=`which ${1}`
     cp ${ORIG} ${DEST}${ORIG}
     l2chroot ${ORIG} ${DEST}
 }
@@ -130,12 +130,12 @@ cd
 # make home, create user
 echo "create user ${USER} and directories"
 mkdir -p ${DEST}/home
-password=$(makepasswd)
-PASS=$(perl -e 'print crypt($ARGV[0], "pass")' $password)
+password=`makepasswd`
+PASS=`perl -e 'print crypt($ARGV[0], "pass")' $password`
 useradd --create-home -s /bin/bash  \
     -d ${DEST}/home/${1} --password ${PASS} \
     ${USER}
-[ $? -eq 0 ] && echo "User has been added to system!" || echo "Failed to add a user!"
+[ ${?} -eq 0 ] && echo "User has been added to system!" || echo "Failed to add a user!"
 adduser ${USER} sshuser
 adduser ${USER} www-data 
 
