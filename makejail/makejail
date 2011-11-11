@@ -42,7 +42,7 @@ function l2chroot()
 {
 	#aqui debemos ucupar los 2 argumentos que recibimos ${1} y ${2}
 	#supongo que se modificaria el BASE
-	BASE="/webroot"
+	BASE="${2}"
 	
 	[ ! -d ${BASE} ] && mkdir -p ${BASE} || : 
 	
