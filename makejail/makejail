@@ -48,7 +48,7 @@ function l2chroot()
 	
 	# iggy ld-linux* file as it is not shared one
 	echo "Copying shared files/libs to $BASE..."
-	for i in `ldd /bin/cp | awk '{print $3}' | grep -E "^/"`
+	for i in `ldd ${1} | awk '{print $3}' | grep -E "^/"`
 	do
 	  d=`dirname $i`
 	  [ ! -d ${BASE}${d} ] && mkdir -p ${BASE}${d} || :
