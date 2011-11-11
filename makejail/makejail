@@ -34,6 +34,42 @@ if [ ${?} -eq 0 ]; then
     exit 1
 fi
 
+################################################################################
+# Descripcion: copia los libreria enlazados desde el binario                   #
+# link: http://www.cyberciti.biz/files/lighttpd/l2chroot.txt                   #
+################################################################################
+function l2chroot()
+{
+	#aqui debemos ucupar los 2 argumentos que recibimos ${1} y ${2}
+	#supongo que se modificaria el BASE
+	BASE="/webroot"
+	
+	[ ! -d ${BASE} ] && mkdir -p ${BASE} || : 
+	
+	# iggy ld-linux* file as it is not shared one
+	echo "Copying shared files/libs to $BASE..."
+	for i in `ldd /bin/cp | awk '{print $3}' | grep -E "^/"`
+	do
+	  d=`dirname $i`
+	  [ ! -d ${BASE}${d} ] && mkdir -p ${BASE}${d} || :
+	  cp ${i} ${BASE}${d}
+	done
+
+	# copy /lib/ld-linux* or /lib64/ld-linux* to $BASE/$sldlsubdir
+	# get ld-linux full file location 
+	sldl=`ldd $1 | grep 'ld-linux' | awk '{ print $1}'`
+	# now get sub-dir
+	sldlsubdir=`dirname $sldl`
+
+	if [ ! -f ${BASE}${sldl} ];
+	then
+	  echo "Copying ${sldl} ${BASE}${sldlsubdir}..."
+	  cp ${sldl} ${BASE}${sldlsubdir}
+	else
+	  :
+	fi
+}
+
 echo "build chroot enviornment"
 mkdir -p ${DEST}
 
