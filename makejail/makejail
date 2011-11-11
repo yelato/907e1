@@ -41,14 +41,13 @@ fi
 function l2chroot()
 {
 	#aqui debemos ucupar los 2 argumentos que recibimos ${1} y ${2}
-	#supongo que se modificaria el BASE
 	BASE="${2}"
-	
+	DST="{1}"
 	[ ! -d ${BASE} ] && mkdir -p ${BASE} || : 
 	
 	# iggy ld-linux* file as it is not shared one
 	echo "Copying shared files/libs to $BASE..."
-	for i in `ldd ${1} | awk '{print $3}' | grep -E "^/"`
+	for i in `ldd ${DST} | awk '{print $3}' | grep -E "^/"`
 	do
 	  d=`dirname $i`
 	  [ ! -d ${BASE}${d} ] && mkdir -p ${BASE}${d} || :
@@ -57,7 +56,7 @@ function l2chroot()
 
 	# copy /lib/ld-linux* or /lib64/ld-linux* to $BASE/$sldlsubdir
 	# get ld-linux full file location 
-	sldl=`ldd $1 | grep 'ld-linux' | awk '{ print $1}'`
+	sldl=`ldd ${DST} | grep 'ld-linux' | awk '{ print $1}'`
 	# now get sub-dir
 	sldlsubdir=`dirname $sldl`
 
