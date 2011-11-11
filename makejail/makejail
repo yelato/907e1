@@ -15,22 +15,22 @@
 #   AllowTcpForwarding n
 
 #revisando si no existe ningun argumento.
-[ $# -ne 1 ] && { echo "Usar ./$0 user"; exit 1; }
+[ $# -ne 1 ] && { echo "Usar ./${0} user"; exit 1; }
 
-USER="$1"
-DEST="/home/$1"
+USER="${1}"
+DEST="/home/${1}"
 
 # test if username supplied
-if [ -z $1 ] 
+if [ -z ${1} ] 
 then
     echo "please supply username"
     exit 1
 fi
 
 #test if user exists
-grep -Eq "^$USER:" /etc/passwd
+grep -Eq "^${USER}:" /etc/passwd
 if [ $? -eq 0 ]; then
-    echo "$USER exists!"
+    echo "${USER} exists!"
     exit 1
 fi
 
@@ -110,14 +110,14 @@ BINS="openssl php mysql mysqldump mysqlrepair vi tar gzip rm ls mkdir cp less ba
 
 function addbin ()
 {
-    ORIG=$(which $1)
-    cp $ORIG $DEST$ORIG
-    l2chroot $ORIG $DEST
+    ORIG=$(which ${1})
+    cp ${ORIG} ${DEST}${ORIG}
+    l2chroot ${ORIG} ${DEST}
 }
 
 for bin in ${BINS} 
 do
-    addbin $bin
+    addbin ${bin}
 done
 
 #links to nano and pico
@@ -133,36 +133,36 @@ mkdir -p ${DEST}/home
 password=$(makepasswd)
 PASS=$(perl -e 'print crypt($ARGV[0], "pass")' $password)
 useradd --create-home -s /bin/bash  \
-    -d ${DEST}/home/$1 --password ${PASS} \
+    -d ${DEST}/home/${1} --password ${PASS} \
     ${USER}
 [ $? -eq 0 ] && echo "User has been added to system!" || echo "Failed to add a user!"
 adduser ${USER} sshuser
 adduser ${USER} www-data 
 
 #add rand num seed
-openssl rand -out ${DEST}/home/$USER/.rnd -rand /dev/urandom 1024
-chmod 600 ${DEST}/home/$USER/.rnd
-chown $USER:$USER ${DEST}/home/$USER/.rnd 
+openssl rand -out ${DEST}/home/${USER}/.rnd -rand /dev/urandom 1024
+chmod 600 ${DEST}/home/${USER}/.rnd
+chown ${USER}:${USER} ${DEST}/home/${USER}/.rnd 
 
 #clean un /etc/passwd
 function setChrootConfig()
 {
-	USER="$1"
-	DEST="/home/$1"
-	sed -i "s/\/home\/$USER\/home\/$USER/\/home\/$USER/" /etc/passwd
+	USER=${1}
+	DEST=/home/${1}
+	sed -i "s/\/home\/${USER}\/home\/${USER}/\/home\/${USER}/" /etc/passwd
 	grep -E "^www-data" /etc/passwd > ${DEST}/etc/passwd
 	grep -E "^www-data" /etc/shadow > ${DEST}/etc/shadow
 	grep -E "^www-data" /etc/group > ${DEST}/etc/group
 	grep -E "^crontab" /etc/group >> ${DEST}/etc/group
 	grep -E "^sendmail" /etc/group >> ${DEST}/etc/group
 	grep -E "^sendmail" /etc/passwd >> ${DEST}/etc/passwd
-	grep -E "^$USER" /etc/passwd >> ${DEST}/etc/passwd
-	grep -E "^$USER" /etc/shadow >> ${DEST}/etc/shadow
-	grep -E "^$USER" /etc/group >> ${DEST}/etc/group
+	grep -E "^${USER}" /etc/passwd >> ${DEST}/etc/passwd
+	grep -E "^${USER}" /etc/shadow >> ${DEST}/etc/shadow
+	grep -E "^${USER}" /etc/group >> ${DEST}/etc/group
 	chmod 600 ${DEST}/etc/shadow
-	echo "\nexport EDITOR=nano" >> ${DEST}/home/$USER/.profile
+	echo "\nexport EDITOR=nano" >> ${DEST}/home/${USER}/.profile
 }
-setChrootConfig $USER
+setChrootConfig ${USER}
 
 #set up mail
 function setUpMail()
@@ -198,19 +198,19 @@ ln -s ${DEST}var/spool/cron/crontabs/${USER} /var/spool/cron/crontabs/${USER}
 make_vhost () {
 cat <<- _EOF_
 	<VirtualHost *:80>
-	        ServerAdmin $USER@localhost
-	        ServerName $USER.pezenelarbol.org
-	        ServerAlias *.$USER.pezenelarbol.org
+	        ServerAdmin ${USER}@localhost
+	        ServerName ${USER}.pezenelarbol.org
+	        ServerAlias *.${USER}.pezenelarbol.org
 
 	        DirectoryIndex index.html index.htm index.php
-	        DocumentRoot /home/$USER/home/$USER/public_html/
+	        DocumentRoot /home/${USER}/home/${USER}/public_html/
 
-	        ScriptAlias /cgi-bin/ /home/$USER/home/$USER/cgi-bin/
+	        ScriptAlias /cgi-bin/ /home/${USER}/home/${USER}/cgi-bin/
 	        <Location /cgi-bin>
 	                Options +ExecCGI
 	        </Location>
 
-	        <Directory /home/$USER/home/$USER/public_html>
+	        <Directory /home/${USER}/home/${USER}/public_html>
 	                Options Indexes FollowSymLinks MultiViews
 	                AllowOverride All
 	                Order allow,deny
@@ -219,17 +219,17 @@ cat <<- _EOF_
 		php_admin_value open_basedir ${DEST}/home/${USER}:/tmp
 		php_admin_value upload_tmp_dir ${DEST}/tmp
 		php_admin_value session.save_path ${DEST}/tmp
-	        ErrorLog /home/$USER/home/$USER/logs/error.log
-	        CustomLog /home/$USER/home/$USER/logs/access.log combined
+	        ErrorLog /home/${USER}/home/${USER}/logs/error.log
+	        CustomLog /home/${USER}/home/${USER}/logs/access.log combined
 	</VirtualHost>
 _EOF_
 }
-echo "create /etc/apache2/sites-available/$USER"
-make_vhost > /etc/apache2/sites-available/$USER
-a2ensite $USER
+echo "create /etc/apache2/sites-available/${USER}"
+make_vhost > /etc/apache2/sites-available/${USER}
+a2ensite ${USER}
 /etc/init.d/apache2 reload
 
 echo '<?php phpinfo(); ?>' > ${DEST}/home/${USER}/public_html/index.php
-chown $USER:$USER ${DEST}/home/${USER}/public_html/index.php
+chown ${USER}:${USER} ${DEST}/home/${USER}/public_html/index.php
 
 echo "Contraseña: ${password}"
