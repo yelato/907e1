@@ -14,6 +14,9 @@
 #   X11Forwarding no
 #   AllowTcpForwarding n
 
+#revisando si no existe ningun argumento.
+[ $# -ne 1 ] && { echo "Usar ./$0 user"; exit 1; }
+
 USER="$1"
 DEST="/home/$1"
 
@@ -54,17 +57,18 @@ mknod -m 666 ${DEST}/dev/tty c 5 0
 chmod 111 /dev
 
 #copiar ficheros de configuracion
-cp /etc/ld.so.cache ${DEST}/etc/ 
-cp /etc/ld.so.conf ${DEST}/etc/
-cp /etc/localtime ${DEST}/etc/
-cp /etc/nsswitch.conf ${DEST}/etc/
-cp /etc/hosts ${DEST}/etc/
-cp /etc/hostname ${DEST}/etc/
-cp /etc/resolv.conf ${DEST}/etc/
-cp /etc/localtime ${DEST}/etc/
-cp -r /etc/ssl ${DEST}/etc/
-mkdir ${DEST}/etc/ssh
-cp /etc/ssh/ssh_config ${DEST}/etc/ssh/
+function copyFilesConfig()
+{
+	FILES="ld.so.cache ld.so.conf localtime nsswitch.conf hosts hostname resolv.conf localtime"
+	for f in ${FILES}
+	do
+		cp /etc/${f} ${1}/etc/ 
+	done
+	cp -r /etc/ssl ${1}/etc/
+	mkdir ${1}/etc/ssh
+	cp /etc/ssh/ssh_config ${1}/etc/ssh/
+}
+copyFilesConfig ${DEST}
 
 #turn off login motd
 touch ${DEST}${DEST}/.hushlogin
@@ -104,7 +108,8 @@ cp /lib/libnss_files.so.2 ${DEST}/lib/
 #copy binarys
 BINS="openssl php mysql mysqldump mysqlrepair vi tar gzip rm ls mkdir cp less bash rsync ssh scp wget date cat mv grep nano chmod gpg passwd nano-tiny find dash editor crontab env dirname uname tput which mail sendmail"
 
-addbin () {
+function addbin ()
+{
     ORIG=$(which $1)
     cp $ORIG $DEST$ORIG
     l2chroot $ORIG $DEST
@@ -140,26 +145,35 @@ chmod 600 ${DEST}/home/$USER/.rnd
 chown $USER:$USER ${DEST}/home/$USER/.rnd 
 
 #clean un /etc/passwd
-sed -i "s/\/home\/$USER\/home\/$USER/\/home\/$USER/" /etc/passwd
-grep -E "^www-data" /etc/passwd > ${DEST}/etc/passwd
-grep -E "^www-data" /etc/shadow > ${DEST}/etc/shadow
-grep -E "^www-data" /etc/group > ${DEST}/etc/group
-grep -E "^crontab" /etc/group >> ${DEST}/etc/group
-grep -E "^sendmail" /etc/group >> ${DEST}/etc/group
-grep -E "^sendmail" /etc/passwd >> ${DEST}/etc/passwd
-grep -E "^$USER" /etc/passwd >> ${DEST}/etc/passwd
-grep -E "^$USER" /etc/shadow >> ${DEST}/etc/shadow
-grep -E "^$USER" /etc/group >> ${DEST}/etc/group
-chmod 600 ${DEST}/etc/shadow
-
-echo "\nexport EDITOR=nano" >> ${DEST}/home/$USER/.profile
+function setChrootConfig()
+{
+	USER="$1"
+	DEST="/home/$1"
+	sed -i "s/\/home\/$USER\/home\/$USER/\/home\/$USER/" /etc/passwd
+	grep -E "^www-data" /etc/passwd > ${DEST}/etc/passwd
+	grep -E "^www-data" /etc/shadow > ${DEST}/etc/shadow
+	grep -E "^www-data" /etc/group > ${DEST}/etc/group
+	grep -E "^crontab" /etc/group >> ${DEST}/etc/group
+	grep -E "^sendmail" /etc/group >> ${DEST}/etc/group
+	grep -E "^sendmail" /etc/passwd >> ${DEST}/etc/passwd
+	grep -E "^$USER" /etc/passwd >> ${DEST}/etc/passwd
+	grep -E "^$USER" /etc/shadow >> ${DEST}/etc/shadow
+	grep -E "^$USER" /etc/group >> ${DEST}/etc/group
+	chmod 600 ${DEST}/etc/shadow
+	echo "\nexport EDITOR=nano" >> ${DEST}/home/$USER/.profile
+}
+setChrootConfig $USER
 
 #set up mail
-chown sendmail.nogroup ${DEST}/usr/bin/sendmail
-cp -r /etc/ssmtp ${DEST}/etc/
-chown root.sendmail ${DEST}/etc/ssmtp/*
-cp /usr/lib/sendmail usr/lib/sendmail
-l2chroot /usr/lib/sendmail ${DEST}
+function setUpMail()
+{
+	chown sendmail.nogroup ${1}/usr/bin/sendmail
+	cp -r /etc/ssmtp ${1}/etc/
+	chown root.sendmail ${1}/etc/ssmtp/*
+	cp /usr/lib/sendmail usr/lib/sendmail
+	l2chroot /usr/lib/sendmail ${1}
+}
+setUpMail ${DEST}
 
 #set up cron
 mkdir -p ${DEST}/var/spool/cron/crontabs
