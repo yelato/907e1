@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 #descripcion: Crea un jail
 #  __ _        _                            
 # / _| |_   _ (_) ___  ___   ___  _ __ __ _ 
@@ -45,7 +45,7 @@ fi
 # Descripcion: copia los libreria enlazados desde el binario                   #
 # link: http://www.cyberciti.biz/files/lighttpd/l2chroot.txt                   #
 ################################################################################
-function l2chroot()
+l2chroot()
 {
 	#aqui debemos ucupar los 2 argumentos que recibimos ${1} y ${2}
 	BASE="${2}"
@@ -99,7 +99,7 @@ mknod -m 666 ${DEST}/dev/tty c 5 0
 chmod 111 /dev
 
 #copiar ficheros de configuracion
-function copyFilesConfig()
+copyFilesConfig()
 {
 	FILES="ld.so.cache ld.so.conf localtime nsswitch.conf hosts hostname resolv.conf localtime"
 	for f in ${FILES}
@@ -150,7 +150,7 @@ cp /lib/libnss_files.so.2 ${DEST}/lib/
 #copy binarys
 BINS="openssl php mysql mysqldump mysqlrepair vi tar gzip rm ls mkdir cp less bash rsync ssh scp wget date cat mv grep nano chmod gpg passwd nano-tiny find dash editor crontab env dirname uname tput which mail sendmail"
 
-function addbin ()
+addbin ()
 {
     ORIG=`which ${1}`
     cp ${ORIG} ${DEST}${ORIG}
@@ -187,7 +187,7 @@ chmod 600 ${DEST}/home/${USER}/.rnd
 chown ${USER}:${USER} ${DEST}/home/${USER}/.rnd 
 
 #clean un /etc/passwd
-function setChrootConfig()
+setChrootConfig()
 {
 	USER=${1}
 	DEST=/home/${1}
@@ -207,7 +207,7 @@ function setChrootConfig()
 setChrootConfig ${USER}
 
 #set up mail
-function setUpMail()
+setUpMail()
 {
 	chown sendmail.nogroup ${1}/usr/bin/sendmail
 	cp -r /etc/ssmtp ${1}/etc/
